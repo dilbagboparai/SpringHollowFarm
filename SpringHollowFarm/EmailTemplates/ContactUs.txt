@@ -1,0 +1,25 @@
+<table style="width: 400px;">
+    <tbody>
+        <tr>
+            <td align="right" style="width: 150px;">Customer Name: </td>
+            <td align="left">%NAME%</td>
+        </tr>
+        <tr>
+            <td align="right" style="width: 150px;">Customer Email: </td>
+            <td align="left">%EMAIL%</td>
+        </tr>
+        <tr>
+            <td align="right" style="width: 150px;">Customer Phone:</td>
+            <td align="left">%PHONE%</td>
+        </tr>
+        <!--<tr>
+            <td colspan="2"> </td>
+        </tr>
+        <tr>
+            <td colspan="2"><strong>%SUBJECT%</strong></td>
+        </tr>-->
+        <tr>
+            <td colspan="2" style="padding-top: 3px;">%MESSAGE%</td>
+        </tr>
+    </tbody>
+</table>
