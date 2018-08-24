@@ -17,7 +17,7 @@ import { FacilitiesComponent } from './components/facilities/facilities.componen
 import { ServicesComponent } from './components/services/services.component';
 import { EventsCalenderComponent } from './components/events-calender/events-calender.component';
 import { AboutUsComponent } from './components/about-us/about-us.component';
-
+import { PaymentsComponent } from "./components/payments/payments.component"
 
 const routes: Routes = [
   { path: '', component: HomeComponent, pathMatch: 'full' },
@@ -27,7 +27,8 @@ const routes: Routes = [
   { path: "facilities", component: FacilitiesComponent },
   { path: "services", component: ServicesComponent },
   { path: "events-calender", component: EventsCalenderComponent },
-  { path: "about-us", component: AboutUsComponent }
+  { path: "about-us", component: AboutUsComponent },
+{ path: "payments", component: PaymentsComponent }
 ];
 @NgModule({
   declarations: [
@@ -40,7 +41,8 @@ const routes: Routes = [
     ServicesComponent,
     EventsCalenderComponent,
     AboutUsComponent,
-    CounterComponent    
+    CounterComponent,
+    PaymentsComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
