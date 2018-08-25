@@ -1,4 +1,5 @@
 import { Component, AfterViewChecked, OnInit } from '@angular/core';
+import { ToastyService } from 'ng2-toasty';
 declare let paypal: any;
 @Component({
   selector: 'app-services',
@@ -7,7 +8,7 @@ declare let paypal: any;
 })
 export class PaymentsComponent implements OnInit, AfterViewChecked {
 
-  constructor() { }
+  constructor(private toast: ToastyService) { }
 
   ngOnInit() {
   }
@@ -28,16 +29,18 @@ export class PaymentsComponent implements OnInit, AfterViewChecked {
       return actions.payment.create({
         payment: {
           transactions: [
-            { amount: { total: this.finalAmount, currency: 'INR' } }
+            { amount: { total: this.finalAmount, currency: 'USD' } }
           ]
         }
       });
     },
     onAuthorize: (data, actions) => {
       return actions.payment.execute().then((payment) => {
+        this.toast.success("Your payment is successfully done.");
         console.log(payment);
-      })
+      });
     }
+
   };
 
   ngAfterViewChecked(): void {
