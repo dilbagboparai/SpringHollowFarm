@@ -9,6 +9,7 @@ import { NavMenuComponent } from './nav-menu/nav-menu.component';
 import { HomeComponent } from './components/home/home.component';
 import { CounterComponent } from './counter/counter.component';
 import { AccountService } from './services/account.service';
+import { BuyServicesService } from "./services/buy-services/buy-services.service";
 import { SharedModule } from './shared/shared.module';
 
 import { StallionsComponent } from './components/stallions/stallions.component';
@@ -17,7 +18,9 @@ import { FacilitiesComponent } from './components/facilities/facilities.componen
 import { ServicesComponent } from './components/services/services.component';
 import { EventsCalenderComponent } from './components/events-calender/events-calender.component';
 import { AboutUsComponent } from './components/about-us/about-us.component';
-import { PaymentsComponent } from "./components/payments/payments.component"
+import { BuyServicesComponent } from "./components/buy-services/buy-services.component";
+
+
 
 const routes: Routes = [
   { path: '', component: HomeComponent, pathMatch: 'full' },
@@ -28,7 +31,7 @@ const routes: Routes = [
   { path: "services", component: ServicesComponent },
   { path: "events-calender", component: EventsCalenderComponent },
   { path: "about-us", component: AboutUsComponent },
-{ path: "payments", component: PaymentsComponent }
+  { path: "buy-services", component: BuyServicesComponent }
 ];
 @NgModule({
   declarations: [
@@ -42,7 +45,7 @@ const routes: Routes = [
     EventsCalenderComponent,
     AboutUsComponent,
     CounterComponent,
-    PaymentsComponent
+    BuyServicesComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -52,7 +55,7 @@ const routes: Routes = [
     SharedModule
   ],
   exports: [],
-  providers: [AccountService],
+  providers: [AccountService, BuyServicesService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

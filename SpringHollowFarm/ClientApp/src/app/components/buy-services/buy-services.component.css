@@ -1,0 +1,75 @@
+/* Style the tab */
+.tab {
+  overflow: hidden;
+  border: 0px;
+  background-color: #0772ba;
+}
+
+/* Style the buttons inside the tab */
+  .tab button {
+    background-color: inherit;
+    float: left;
+    border: none;
+    font-weight: 600;
+    outline: none;
+    cursor: pointer;
+    padding: 14px 16px;
+    transition: 0.3s;
+    font-size: 17px;
+  }
+
+/* Change background color of buttons on hover */
+    .tab button:hover {
+      color: #ccc;
+    }
+
+/* Create an active/current tablink class */
+    .tab button.active {
+      color: #ccc;
+    }
+
+/* Style the tab content */
+.tabcontent {
+  display: none;
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  border-top: none;
+}
+.card {
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+  max-width: 300px;
+  margin: auto;
+  text-align: center;
+  font-family: arial;
+}
+
+.price {
+  color: grey;
+  font-size: 22px;
+}
+
+.card button {
+  border: none;
+  outline: 0;
+  padding: 12px;
+  color: white;
+  background-color: #0772ba;
+  text-align: center;
+  cursor: pointer;
+  width: 100%;
+  font-size: 18px;
+}
+
+  .card button:hover {
+    color: #ccc;
+  }
+.card-list {
+  text-align: center;
+}
+.card-list .card {
+    display: inline-block;
+    margin: 10px;
+  }
+div#paypal-checkout-btn {
+    margin-bottom: -10px;
+}

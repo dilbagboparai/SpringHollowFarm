@@ -5,13 +5,19 @@ using System.Net.Mail;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using SpringHollowFarm.Models;
 
 namespace SpringHollowFarm.Controllers
 {
     [Route("api")]
     public class APIController : Controller
-    {    
+    {
+        private readonly AppSettings _appSettings;
+        public APIController(IOptions<AppSettings> appSettings)
+        {
+            _appSettings = appSettings.Value;
+        }
         public ApiResponse<ContactModel> response { get; set; }
 
         [Route("contactus")]
@@ -59,6 +65,34 @@ namespace SpringHollowFarm.Controllers
                 return Ok(response);
             }
             return Ok(response);
+        }
+        [Route("getAllServices")]
+        public async Task<IActionResult> GetAsync()
+        {
+            ApiResponse<List<ServiceModel>> response = null;
+            try
+            {
+                var result = _appSettings.Services.ToList();
+                response = new ApiResponse<List<ServiceModel>>()
+                {
+                    Data = result,
+                    Error = false,
+                    StatusCode = 100
+                };
+                return Ok(response);
+
+            }
+            catch (Exception ex)
+            {
+                response = new ApiResponse<List<ServiceModel>>()
+                {
+                    Message = ex.Message,
+                    Data = null,
+                    Error = true,
+                    StatusCode = 501
+                };
+                return Ok(response);
+            }
         }
     }
 }

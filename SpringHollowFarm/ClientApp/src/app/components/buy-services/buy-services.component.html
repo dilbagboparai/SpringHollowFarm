@@ -1,0 +1,57 @@
+<div class="inner-pages">
+<div class="container">
+  <div class="tab">
+    <button class="tablinks active" (click)="openTab($event, 'Services')">Services</button>
+    <button class="tablinks" (click)="openTab($event, 'Cart')">Cart</button>
+  </div>
+
+  <div id="Services" class="tabcontent">
+    <div class="card-list" >
+    <div class="card" *ngFor='let service of services'>
+      <img src="{{'./assets/images/'+service.image}}" alt="Buy Now" style="width:100%">
+      <p><strong> {{service.name}}</strong></p>
+      <p class="price">${{service.price}}</p>
+      <p>{{service.description}}</p>
+      <p><button  (click)="onCartAdd($event,service)" >Add to Cart</button></p>
+    </div>
+    </div>
+  </div>
+
+  <div id="Cart" class="tabcontent">
+    <div *ngIf="cartStore.length <= 0">
+      <p class="text-center">No items in the Cart!</p>
+    </div>
+    <table *ngIf="cartStore.length > 0" class="table table-striped table-hover ">
+      <thead>
+        <tr>
+          <th>Quantity</th>
+          <th>Name</th>
+          <th>Price</th>
+          <!--<th>Image</th>-->
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of cartStore; let i = index">
+          <td>1</td>
+          <td>{{item.name}}</td>
+          <td>{{item.price}}</td>
+          <!--<td><img src="{{path + item.image}}" width="100" height="100" /></td>-->
+          <td><button (click)="removeService(item)" class="btn btn-xs btn-danger">Remove Product</button></td>
+        </tr>
+        <tr class="warning">
+          <td></td>
+          <td><p><strong>Items: {{totalQuantity}}</strong> </p></td>
+          <td><p><strong> Total: ${{totalPrice}}</strong> </p></td>
+          <td>
+            <!--<button (click)="checkout()" class="btn btn-md btn-success">Checkout</button>-->
+            <p *ngIf="paypalLoad">Paypal button is loading</p>
+            <div id="paypal-checkout-btn"></div>
+          </td>
+       
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+</div>
