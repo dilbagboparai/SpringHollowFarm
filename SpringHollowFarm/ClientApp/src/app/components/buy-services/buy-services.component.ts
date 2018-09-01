@@ -2,6 +2,7 @@ import { Component, AfterViewChecked, OnInit ,Directive} from '@angular/core';
 import { ToastyService } from 'ng2-toasty';
 import { BuyServicesService } from '../../services/buy-services/buy-services.service';
 import { Service } from '../../models/service'
+import { User } from '../../models/user';
 declare let paypal: any;
 @
 Component({
@@ -15,6 +16,8 @@ export class BuyServicesComponent implements OnInit, AfterViewChecked {
  public cartStore: Service[] = [];
   public totalPrice: number;
   public totalQuantity: number;
+  public user: User = new User();
+  public  actions:any;
   constructor(private toast: ToastyService, private buyServices:BuyServicesService) {
   }
 
@@ -49,9 +52,11 @@ export class BuyServicesComponent implements OnInit, AfterViewChecked {
   }
 
   //On click of add to cart button
-  onCartAdd(event, item) {
+  onCartAdd(event, item: Service) {
     let index = this.getIndexById(item.id);
     if (index == -1) {
+      let additionPrice = this.getAdditionPrice(item);
+      item.totalPrice = item.price + additionPrice;
       this.cartStore.push(item);
       this.toast.success(item.name + " is added into your cart.");
       this.getTotalPrice();
@@ -70,14 +75,26 @@ export class BuyServicesComponent implements OnInit, AfterViewChecked {
   getIndexById(id) {
  return  this.cartStore.findIndex(x => x.id == id);
   }
+  getAdditionPrice(_item: Service) {
+    let totalCost: Array<number> = [];
+    let intPrice: number;
+    _item.additionalFees.forEach((item, i) => {
+      intPrice = item.value;
+      totalCost.push(intPrice)
 
+    });
+    let totaladdition =totalCost.reduce((acc, item) => {
+      return acc += item
+    }, 0);
+    return totaladdition;
+  }
   getTotalPrice() {
     let totalCost: Array<number> = []
     let quantity: Array<number> = []
     let intPrice: number
     let intQuantity: number
     this.cartStore.forEach((item, i) => {
-      intPrice =item.price
+      intPrice = item.totalPrice
       intQuantity = 1
       totalCost.push(intPrice)
       quantity.push(intQuantity)
@@ -90,6 +107,38 @@ export class BuyServicesComponent implements OnInit, AfterViewChecked {
       return acc += item
     }, 0)
   }
+  isValid() {
+    if (!this.user.firstName || !this.user.lastName || !this.user.email || !this.user.phone) {
+      return false;
+    } else
+      return true;
+  }
+ 
+  onchangeForm() {
+    if (this.actions != null)
+      this.toggleButton(this.actions);
+  }
+  toggleButton(actions:any) {
+    this.isValid() ? actions.enable() : actions.disable();
+  }
+
+  toggleValidationMessage() {
+    if (!this.user.firstName) {
+      this.toast.error("Firstname cann't be empty.")
+      return;
+    }
+    else if (!this.user.lastName) {
+      this.toast.error("Lastname cann't be empty."); return;
+    }
+    else if (!this.user.email) {
+      this.toast.error("Email cann't be empty."); return;
+    }
+    else if (!this.user.phone) {
+      this.toast.error("Phone cann't be empty."); return;
+    }
+    this.toggleButton(this.actions);
+  }
+  
 
   addScript: boolean = false;
   paypalLoad: boolean = true;
@@ -103,6 +152,16 @@ export class BuyServicesComponent implements OnInit, AfterViewChecked {
       production: '<your-production-key-here>'
     },
     commit: true,
+
+    validate:(actions:any)=> {
+      this.toggleButton(actions);
+      this.actions = actions;
+    },
+
+    onClick:()=> {
+      this.toggleValidationMessage();
+    },
+
     payment: (data, actions) => {
       return actions.payment.create({
         payment: {
@@ -114,8 +173,21 @@ export class BuyServicesComponent implements OnInit, AfterViewChecked {
     },
     onAuthorize: (data, actions) => {
       return actions.payment.execute().then((payment) => {
-        this.toast.success("Your payment is successfully done.");
-        console.log(payment);
+        this.buyServices.paymentCompleted(this.user).subscribe(
+          data => {
+            this.toast.success("Your payment is successfully completed.");
+            console.log(payment);
+            this.user.firstName = '';
+            this.user.lastName = '';
+            this.user.email = '';
+            this.user.phone = '';
+            this.user.message = '';
+            this.cartStore = [];
+          },
+          Error => {
+            console.log(Error);
+            this.toast.success("A error occured, Please try again");
+          });
       });
     }
 

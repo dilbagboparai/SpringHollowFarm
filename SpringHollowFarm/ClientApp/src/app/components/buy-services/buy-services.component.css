@@ -73,3 +73,9 @@
 div#paypal-checkout-btn {
     margin-bottom: -10px;
 }
+.tabcontent h2 {
+  color: #003333;
+  font-size: 24px;
+  padding-bottom: 12px;
+  font-weight: 600;
+}

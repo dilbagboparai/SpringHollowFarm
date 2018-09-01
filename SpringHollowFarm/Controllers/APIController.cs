@@ -1,12 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Mail;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using SpringHollowFarm.Models;
+using SpringHollowFarm.Services;
 
 namespace SpringHollowFarm.Controllers
 {
@@ -93,6 +95,63 @@ namespace SpringHollowFarm.Controllers
                 };
                 return Ok(response);
             }
+
+        }
+
+        [Route("paymentCompleted")]
+        [HttpPost]
+        public async Task<IActionResult> PaymentCompleted([FromBody]ContactModel model)
+        {
+            ApiResponse<List<ServiceModel>> response = null;
+            if(model == null)
+                response = new ApiResponse<List<ServiceModel>>()
+                {
+                    Message = "Model can not be null.",
+                    Data = null,
+                    Error = true,
+                    StatusCode = (int)HttpStatusCode.BadRequest
+                };
+            if (string.IsNullOrEmpty(model.Email))
+                response = new ApiResponse<List<ServiceModel>>()
+                {
+                    Message = "Email can not be null or empty",
+                    Data = null,
+                    Error = true,
+                    StatusCode = (int)HttpStatusCode.BadRequest
+                };
+             if (response !=null && response.Error)
+               return Ok(response);
+
+            try
+            {
+                List<string> toEmail = new List<string>();
+                toEmail.Add(model.Email);
+
+                List<string> ccEmail = new List<string>();
+               
+                string body = "This is dummy body.";
+                await EmailService.SendEmailAsync(toEmail, ccEmail, "Payment Completed", body);
+
+                //TO DO FOR SEND EMAIL TO ADMIN    ****************************     //
+                //List<string> adminToEmail = new List<string>();
+                //adminToEmail.Add("admin@admin.com");
+                //string adminBody = "This is dummy body.";
+                //await EmailService.SendEmailAsync(adminToEmail, null, "Payment Completed", adminBody);
+
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                response = new ApiResponse<List<ServiceModel>>()
+                {
+                    Message = ex.Message,
+                    Data = null,
+                    Error = true,
+                    StatusCode = 501
+                };
+                return Ok(response);
+            }   
+           
         }
     }
 }
