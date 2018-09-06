@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@angular/core';
 import { HttpClient, HttpResponse } from '@angular/common/http';
-import { User } from '../../models/user';
+import { Order } from "../../models/order";
 
 @Injectable()
 export class BuyServicesService {
@@ -12,7 +12,7 @@ export class BuyServicesService {
   getServices():any {
     return this.client.get<any>("api/getAllServices");
   }; 
-  paymentCompleted(user: User): any {
-    return this.client.post('api/paymentCompleted', user).pipe();
+  paymentCompleted(model: Order): any {
+    return this.client.post('api/paymentCompleted', model).pipe();
   }; 
 }

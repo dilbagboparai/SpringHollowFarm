@@ -16,9 +16,11 @@ namespace SpringHollowFarm.Controllers
     public class APIController : Controller
     {
         private readonly AppSettings _appSettings;
-        public APIController(IOptions<AppSettings> appSettings)
+        private readonly IEmailService _emailSettings;
+        public APIController(IOptions<AppSettings> appSettings,IEmailService emailService)
         {
             _appSettings = appSettings.Value;
+            _emailSettings = emailService;
         }
         public ApiResponse<ContactModel> response { get; set; }
 
@@ -100,7 +102,7 @@ namespace SpringHollowFarm.Controllers
 
         [Route("paymentCompleted")]
         [HttpPost]
-        public async Task<IActionResult> PaymentCompleted([FromBody]ContactModel model)
+        public async Task<IActionResult> PaymentCompleted([FromBody]OrderDetailModel model)
         {
             ApiResponse<List<ServiceModel>> response = null;
             if(model == null)
@@ -124,13 +126,8 @@ namespace SpringHollowFarm.Controllers
 
             try
             {
-                List<string> toEmail = new List<string>();
-                toEmail.Add(model.Email);
-
-                List<string> ccEmail = new List<string>();
-               
-                string body = "This is dummy body.";
-                await EmailService.SendEmailAsync(toEmail, ccEmail, "Payment Completed", body);
+                string body = _emailSettings.PopulateBody(@".\EmailTemplates\PaymentConfirmation.html", model);
+                await _emailSettings.SendEmailAsync(model.Email, "", body, "Payment Completed");
 
                 //TO DO FOR SEND EMAIL TO ADMIN    ****************************     //
                 //List<string> adminToEmail = new List<string>();

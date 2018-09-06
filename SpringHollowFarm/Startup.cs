@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SpringHollowFarm.Models;
+using SpringHollowFarm.Services;
 
 namespace SpringHollowFarm
 {
@@ -25,6 +26,9 @@ namespace SpringHollowFarm
             // configure strongly typed settings objects
             var appSettingsSection = Configuration.GetSection("AppSettings");
             services.Configure<AppSettings>(appSettingsSection);
+
+            services.Configure<EmailSettings>(Configuration.GetSection("EmailSettings"));
+            services.AddTransient<IEmailService, EmailService>();
 
             // In production, the Angular files will be served from this directory
             services.AddSpaStaticFiles(configuration =>

@@ -43,24 +43,34 @@
       <div class="col-md-5">
         <div class="contact-us-form">
           <h2>Contact Us</h2>
+          <form #contactUsForm="ngForm" name="contactUsForm" (ngSubmit)="submitInfo(contactUsForm)" >
           <ul>
             <li>
-              <input type="text" [(ngModel)]="user.firstName" placeholder="First Name">
+              <input type="text" [(ngModel)]="user.firstName"  name="firstName" required placeholder="First Name" #firstName="ngModel">
+              <div *ngIf="firstName.invalid && (firstName.dirty || firstName.touched || submitted)"
+                   class="alert alert-danger">First Name is required.</div>
             </li>
             <li>
-              <input type="text" [(ngModel)]="user.lastName" placeholder="Last Name">
+              <input type="text" [(ngModel)]="user.lastName" name="lastName" required placeholder="Last Name" #lastName="ngModel">
+              <div *ngIf="lastName.invalid && (lastName.dirty || lastName.touched  || submitted)"
+                   class="alert alert-danger">Last Name is required.</div></li>
+            <li>
+              <input type="email" [(ngModel)]="user.email" placeholder="Email" required name="email" #email="ngModel" pattern="^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$">
+              <div *ngIf="email.invalid && (email.dirty || email.touched  || submitted)"
+                   class="alert alert-danger">Email Name is required.</div>
             </li>
             <li>
-              <input type="text" [(ngModel)]="user.email" placeholder="Email">
+              <input type="text" [(ngModel)]="user.phone" name="phoneNumber" placeholder="Phone number(Optional)">
             </li>
             <li>
-              <input type="text" [(ngModel)]="user.phone" placeholder="Phone number">
+              <textarea [(ngModel)]="user.message" name="message" placeholder="Message(Optional)"></textarea>
             </li>
             <li>
-              <textarea [(ngModel)]="user.message" placeholder="Message"></textarea>
-            </li>
-            <button class="sub-btn" (click)="submitInfo()">Submit</button>
+              <img  *ngIf="submitting" src="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==" /><br/>
+              <button class="sub-btn" >Submit</button>
+            </li>   
           </ul>
+          </form>
         </div>
       </div>
       <div class="col-md-7">

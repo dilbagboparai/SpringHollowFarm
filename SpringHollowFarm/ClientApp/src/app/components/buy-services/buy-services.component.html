@@ -2,7 +2,7 @@
   <div class="container">
     <div class="tab">
       <button class="tablinks active" (click)="openTab($event, 'Services')">Services</button>
-      <button class="tablinks" (click)="openTab($event, 'Cart')">Cart</button>
+      <button class="tablinks" [ngClass]="getCartNotification()" value="{{order.products.length}}" (click)="openTab($event, 'Cart')">Cart</button>
     </div>
 
     <div id="Services" class="tabcontent">
@@ -26,59 +26,70 @@
     </div>
 
     <div id="Cart" class="tabcontent">
-      <div *ngIf="cartStore.length <= 0">
-        <p class="text-center">No items in the Cart!</p>
+      <div *ngIf="order.products.length <= 0 && !paymentCompleted">
+        <p class="text-center">No items in the Cart !</p>
       </div>
-      <div *ngIf="cartStore.length > 0">
-        <div class="col-md-8" >
-            <h2>Please Enter Your Details</h2>
+      <div class="alert alert-success" *ngIf="order.products.length <= 0 && paymentCompleted">
+        <p class="text-center">Your payment is completed, Thank You!</p>
+      </div>
+      <div *ngIf="order.products.length > 0">
+        <div class="col-md-8">
+          <h2>Please Enter Your Details</h2>
+          <form #orderForm="ngForm" name="contactUsForm" (ngSubmit)="submitInfo(contactUsForm)">
             <ul>
               <li>
-                <input type="text" [(ngModel)]="user.firstName"  (change)="onchangeForm()" placeholder="First Name">
+                <input type="text" [(ngModel)]="order.firstName" name="firstName" (change)="onchangeForm(orderForm)" required placeholder="First Name" #firstName="ngModel">
+                <div *ngIf="firstName.invalid && (firstName.dirty || firstName.touched || submitted)"
+                     class="alert alert-danger">First Name is required.</div>
               </li>
               <li>
-                <input type="text" [(ngModel)]="user.lastName" (change)="onchangeForm()" placeholder="Last Name">
+                <input type="text" [(ngModel)]="order.lastName" name="lastName" (change)="onchangeForm(orderForm)" required placeholder="Last Name" #lastName="ngModel">
+                <div *ngIf="lastName.invalid && (lastName.dirty || lastName.touched  || submitted)"
+                     class="alert alert-danger">Last Name is required.</div>
               </li>
               <li>
-                <input type="text" [(ngModel)]="user.email" (change)="onchangeForm()" placeholder="Email">
+                <input type="email" [(ngModel)]="order.email" placeholder="Email" (change)="onchangeForm(orderForm)" required name="email" #email="ngModel" pattern="^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$">
+                <div *ngIf="email.invalid && (email.dirty || email.touched  || submitted)"
+                     class="alert alert-danger">Email Name is required.</div>
               </li>
               <li>
-                <input type="text" [(ngModel)]="user.phone" (change)="onchangeForm()" placeholder="Phone number">
+                <input type="text" [(ngModel)]="order.phone" name="phone" (change)="onchangeForm()" placeholder="Phone number(optional)">
               </li>
             </ul>
-      </div>
-        <table  class="table table-striped table-hover ">
+          </form>
+        </div>
+        <table class="table table-striped table-hover ">
           <thead>
-          <tr>
-            <th>Quantity</th>
-            <th>Name</th>
-            <th>Price</th>
-            <!--<th>Image</th>-->
-            <th>Action</th>
-          </tr>
+            <tr>
+              <th>Quantity</th>
+              <th>Name</th>
+              <th>Price</th>
+              <!--<th>Image</th>-->
+              <th>Action</th>
+            </tr>
           </thead>
           <tbody>
-          <tr *ngFor="let item of cartStore; let i = index">
-            <td>1</td>
-            <td>{{item.name}}</td>
-            <td>{{item.totalPrice}}</td>
-            <!--<td><img src="{{path + item.image}}" width="100" height="100" /></td>-->
-            <td><button (click)="removeService(item)" class="btn btn-xs btn-danger">Remove Product</button></td>
-          </tr>
-          <tr class="warning">
-            <td></td>
-            <td><p><strong>Items: {{totalQuantity}}</strong> </p></td>
-            <td><p><strong> Total: ${{totalPrice}}</strong> </p></td>
-            <td>
-              <!--<button (click)="checkout()" class="btn btn-md btn-success">Checkout</button>-->
-              <p *ngIf="paypalLoad">Paypal button is loading</p>
-              <div id="paypal-checkout-btn"></div>
-            </td>
-       
-          </tr>
+            <tr *ngFor="let item of order.products; let i = index">
+              <td>1</td>
+              <td>{{item.name}}</td>
+              <td>{{item.totalPrice}}</td>
+              <!--<td><img src="{{path + item.image}}" width="100" height="100" /></td>-->
+              <td><button (click)="removeService(item)" class="btn btn-xs btn-danger">Remove Product</button></td>
+            </tr>
+            <tr class="warning">
+              <td></td>
+              <td><p><strong>Items: {{order.totalQuantity}}</strong> </p></td>
+              <td><p><strong> Total: ${{order.totalAmount}}</strong> </p></td>
+              <td>
+                <p *ngIf="paypalLoad">Paypal button is loading</p>
+                <div id="paypal-checkout-btn"></div>
+                <!--<button (click)="onCheckOut()" class="btn btn-xs btn-success">Test CheckOut</button>-->
+              </td>
+
+            </tr>
           </tbody>
         </table>
-        </div>
+      </div>
     </div>
   </div>
 </div>

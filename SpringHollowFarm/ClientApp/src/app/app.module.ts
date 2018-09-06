@@ -4,6 +4,14 @@ import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { RouterModule, Routes } from '@angular/router';
 
+import { StoreModule } from '@ngrx/store';
+import { EffectsModule } from '@ngrx/effects';
+import { StoreDevtoolsModule } from '@ngrx/store-devtools';
+
+import { ACTIONS } from './store/actions';
+import { reducers, metaReducers } from './store/reducers';
+import { AllEffects } from './store/effects';
+
 import { AppComponent } from './app.component';
 import { NavMenuComponent } from './nav-menu/nav-menu.component';
 import { HomeComponent } from './components/home/home.component';
@@ -52,10 +60,13 @@ const routes: Routes = [
     HttpClientModule,
     FormsModule,
     RouterModule.forRoot(routes),
-    SharedModule
+    SharedModule,
+    StoreModule.forRoot(reducers,
+       { metaReducers }
+    )
   ],
   exports: [],
-  providers: [AccountService, BuyServicesService],
+  providers: [AccountService, BuyServicesService,ACTIONS],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

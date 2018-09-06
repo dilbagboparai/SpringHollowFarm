@@ -1,8 +1,11 @@
 import { Component, AfterViewChecked, OnInit ,Directive} from '@angular/core';
 import { ToastyService } from 'ng2-toasty';
+import { NgForm } from '@angular/forms';
 import { BuyServicesService } from '../../services/buy-services/buy-services.service';
+import { CartAction } from "../../store/actions/cart.actions";
+import { Subscription } from 'rxjs/Subscription';
 import { Service } from '../../models/service'
-import { User } from '../../models/user';
+import { Order } from "../../models/order"
 declare let paypal: any;
 @
 Component({
@@ -12,25 +15,34 @@ Component({
 })
  
 export class BuyServicesComponent implements OnInit, AfterViewChecked {
- public   services: Service[];
- public cartStore: Service[] = [];
-  public totalPrice: number;
-  public totalQuantity: number;
-  public user: User = new User();
-  public  actions:any;
-  constructor(private toast: ToastyService, private buyServices:BuyServicesService) {
+  public services: Service[];
+  quantity: number;
+  public order: Order = new Order();
+  public actions: any;
+  public cartSubscription: Subscription;
+  public orderForm:NgForm;
+  submitted: boolean = false;
+  paymentCompleted:boolean=false;
+  constructor(private toast: ToastyService, private buyServices: BuyServicesService, private cartStore: CartAction) {
   }
 
   ngOnInit() {
+    this.cartSubscription = this.cartStore.getState().subscribe(res => {
+      this.order.products = res.products
+      this.getTotalPrice()
+    })
     let element: HTMLElement = document.getElementsByClassName('tablinks')[0] as HTMLElement;
     element.click();
     this.getServices();
     this.getTotalPrice();
   }
 
+  ngOnDestroy() {
+    this.cartSubscription.unsubscribe()
+  }
 
-
-  openTab(evt:any, cityName:string):void {
+  openTab(evt: any, cityName: string): void {
+    this.paymentCompleted = false;
     var i, tabcontent, tablinks;
     tabcontent = document.getElementsByClassName("tabcontent");
     for (i = 0; i < tabcontent.length; i++) {
@@ -57,7 +69,7 @@ export class BuyServicesComponent implements OnInit, AfterViewChecked {
     if (index == -1) {
       let additionPrice = this.getAdditionPrice(item);
       item.totalPrice = item.price + additionPrice;
-      this.cartStore.push(item);
+      this.cartStore.addToCart(item, this.quantity || 1)
       this.toast.success(item.name + " is added into your cart.");
       this.getTotalPrice();
     }
@@ -67,13 +79,12 @@ export class BuyServicesComponent implements OnInit, AfterViewChecked {
 
    //On click of remove to cart
   removeService(item: Service) {
-    let index = this.getIndexById(item.id);
-    this.cartStore.splice(index, 1);
-    this.getTotalPrice();
+    this.cartStore.removeFromCart(item)
+    //this.getTotalPrice();
   }
 
   getIndexById(id) {
- return  this.cartStore.findIndex(x => x.id == id);
+ return  this.order.products.findIndex(x => x.id == id);
   }
   getAdditionPrice(_item: Service) {
     let totalCost: Array<number> = [];
@@ -93,53 +104,71 @@ export class BuyServicesComponent implements OnInit, AfterViewChecked {
     let quantity: Array<number> = []
     let intPrice: number
     let intQuantity: number
-    this.cartStore.forEach((item, i) => {
+    this.order.products.forEach((item, i) => {
       intPrice = item.totalPrice
       intQuantity = 1
       totalCost.push(intPrice)
       quantity.push(intQuantity)
     })
 
-    this.totalPrice = totalCost.reduce((acc, item) => {
+    this.order.totalAmount = totalCost.reduce((acc, item) => {
       return acc += item
     }, 0)
-    this.totalQuantity = quantity.reduce((acc, item) => {
+    this.order.totalQuantity = quantity.reduce((acc, item) => {
       return acc += item
     }, 0)
   }
   isValid() {
-    if (!this.user.firstName || !this.user.lastName || !this.user.email || !this.user.phone) {
+    if (!this.order.firstName || !this.order.lastName || !this.order.email || !this.order.phone) {
       return false;
     } else
       return true;
   }
  
-  onchangeForm() {
+  onchangeForm(_orderForm: NgForm) {
+    this.orderForm = _orderForm;
     if (this.actions != null)
       this.toggleButton(this.actions);
   }
+
+  getCartNotification() {
+    return  this.order.products.length > 0 ? 'cart' : '';
+  }
+
   toggleButton(actions:any) {
     this.isValid() ? actions.enable() : actions.disable();
   }
 
   toggleValidationMessage() {
-    if (!this.user.firstName) {
+    if (!this.order.firstName) {
       this.toast.error("Firstname cann't be empty.")
       return;
     }
-    else if (!this.user.lastName) {
+    else if (!this.order.lastName) {
       this.toast.error("Lastname cann't be empty."); return;
     }
-    else if (!this.user.email) {
+    else if (!this.order.email) {
       this.toast.error("Email cann't be empty."); return;
     }
-    else if (!this.user.phone) {
+    else if (!this.order.phone) {
       this.toast.error("Phone cann't be empty."); return;
     }
     this.toggleButton(this.actions);
   }
   
-
+  onCheckOut() {
+    this.buyServices.paymentCompleted(this.order).subscribe(
+      data => {
+        this.toast.success("Your payment is successfully completed.");
+        this.order = new Order();
+        this.submitted = false;
+        this.paymentCompleted = true;
+      },
+      Error => {
+        console.log(Error);
+        this.toast.success("A error occured, Please try again");
+      });
+  };
   addScript: boolean = false;
   paypalLoad: boolean = true;
 
@@ -158,43 +187,42 @@ export class BuyServicesComponent implements OnInit, AfterViewChecked {
       this.actions = actions;
     },
 
-    onClick:()=> {
-      this.toggleValidationMessage();
+    onClick: () => {
+      this.submitted = true;
+      //this.toggleValidationMessage();
     },
 
     payment: (data, actions) => {
       return actions.payment.create({
         payment: {
           transactions: [
-            { amount: { total: this.totalPrice, currency: 'USD' } }
+            { amount: { total: this.order.totalAmount, currency: 'USD' } }
           ]
         }
       });
     },
     onAuthorize: (data, actions) => {
       return actions.payment.execute().then((payment) => {
-        this.buyServices.paymentCompleted(this.user).subscribe(
+        this.buyServices.paymentCompleted(this.order).subscribe(
           data => {
             this.toast.success("Your payment is successfully completed.");
-            console.log(payment);
-            this.user.firstName = '';
-            this.user.lastName = '';
-            this.user.email = '';
-            this.user.phone = '';
-            this.user.message = '';
-            this.cartStore = [];
+            this.submitted = false;
+            this.paymentCompleted = true;
+            this.order = new Order();
           },
           Error => {
             console.log(Error);
+            this.submitted = false;
             this.toast.success("A error occured, Please try again");
           });
       });
+      
     }
 
   };
 
   ngAfterViewChecked(): void {
-    if (!this.addScript && this.cartStore.length>0) {
+    if (!this.addScript && this.order.products.length>0) {
       this.addPaypalScript().then(() => {
         paypal.Button.render(this.paypalConfig, '#paypal-checkout-btn');
         this.paypalLoad = false;

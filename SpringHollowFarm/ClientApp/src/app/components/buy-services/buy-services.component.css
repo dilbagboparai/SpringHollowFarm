@@ -4,6 +4,9 @@
   border: 0px;
   background-color: #0772ba;
 }
+.alert.alert-danger {
+  padding: 5px;
+}
 
 /* Style the buttons inside the tab */
   .tab button {
@@ -78,4 +81,21 @@ div#paypal-checkout-btn {
   font-size: 24px;
   padding-bottom: 12px;
   font-weight: 600;
+}
+.cart:not(.active):after {
+  content: attr(value);
+  position: absolute;
+  background: red;
+  height: 1.5rem;
+  top: 0rem;
+  right: 0.rem;
+  width: 1.5rem;
+  text-align: center;
+  line-height: 1.5rem;
+  font-size: 1rem;
+  border-radius: 50%;
+  color: white;
+  border: 1px solid red;
+  font-family: sans-serif;
+  font-weight: bold;
 }

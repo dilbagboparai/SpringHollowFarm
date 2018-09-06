@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { NgForm } from '@angular/forms';
 import { AccountService } from '../../services/account.service';
 import { User } from '../../models/user';
 import { ToastyService } from 'ng2-toasty';
@@ -14,6 +15,8 @@ declare var $: any;
 export class HomeComponent implements OnInit {
   imageObject: any;
   user: User = new User();
+  submitted: boolean = false;
+  submitting:boolean = false;
   constructor(
     private accountService: AccountService,
     private toast: ToastyService
@@ -21,42 +24,32 @@ export class HomeComponent implements OnInit {
   ) {
 
   }
-  submitInfo() {
-    if (!this.user.firstName) {
-      this.toast.error("Firstname cann't be empty.")
-      return;
-    }
-    else if (!this.user.lastName) {
-      this.toast.error("Lastname cann't be empty."); return;
-    }
-    else if (!this.user.email) {
-      this.toast.error("Email cann't be empty."); return;
-    }
-    else if (!this.user.phone) {
-      this.toast.error("Phone cann't be empty."); return;
-    }
-    else if (!this.user.message) {
-      this.toast.error("Message cann't be empty."); return;
-    }
-
-    this.accountService.contactUs(this.user).subscribe(
-      data =>
-      {        
-        console.log(data);        
-        this.toast.success("Email Sent Sucessfully!");
-        this.user.firstName = '';
-        this.user.lastName = '';
-        this.user.email = '';
-        this.user.phone = '';
-        this.user.message = ''; 
-      },
-      Error => {
-        console.log(Error);
-        this.toast.success("A error occured, Please try again");
-      });
-     
-    
+  submitInfo(contactUsForm: NgForm) {
+    this.submitted = true;
+    if (contactUsForm.valid) {
+      this.submitting = true;
+      this.accountService.contactUs(this.user).subscribe(
+        data => {
+          console.log(data);
+          this.toast.success("Email Sent Sucessfully!");
+          this.user.firstName = '';
+          this.user.lastName = '';
+          this.user.email = '';
+          this.user.phone = '';
+          this.user.message = '';
+          this.submitting = false;
+          this.submitted = false;
+          contactUsForm.resetForm();
+        },
+        Error => {
+          console.log(Error);
+          this.submitting = false;
+          this.submitted = false;
+          contactUsForm.resetForm();
+          this.toast.success("A error occured, Please try again");
+        });
       
+    } 
   }
 
   ngOnInit() {
