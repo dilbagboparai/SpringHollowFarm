@@ -12,7 +12,8 @@ export const ActionTypes = {
   LOAD:             type('[Cart] Load'),
   SELECT:           type('[Cart] Select'),
   ADD_TO_CART:      type('[Cart] Add'),
-  REMOVE_FROM_CART:      type('[Cart] Remove'),
+  REMOVE_FROM_CART: type('[Cart] Remove'),
+  REMOVE_ALL_FROM_CART:type('[Cart] Clear'),
 };
 
 @Injectable()
@@ -43,5 +44,11 @@ export class CartAction {
             payload: payload
         })
     }
-
+  clearFromCart() {
+    console.log('clear,', [])
+    this.store.dispatch({
+      type: ActionTypes.REMOVE_ALL_FROM_CART,
+      payload: []
+    })
+  }
 }

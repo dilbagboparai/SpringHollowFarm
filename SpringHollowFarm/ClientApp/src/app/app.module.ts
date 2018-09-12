@@ -26,9 +26,8 @@ import { FacilitiesComponent } from './components/facilities/facilities.componen
 import { ServicesComponent } from './components/services/services.component';
 import { EventsCalenderComponent } from './components/events-calender/events-calender.component';
 import { AboutUsComponent } from './components/about-us/about-us.component';
-import { BuyServicesComponent } from "./components/buy-services/buy-services.component";
-
-
+import { BuyServicesComponent } from "./components/buy-services/buy-services.component"
+import { CanDeactivateGuard } from "./can-deactivate/can-deactivate-guard";
 
 const routes: Routes = [
   { path: '', component: HomeComponent, pathMatch: 'full' },
@@ -66,7 +65,7 @@ const routes: Routes = [
     )
   ],
   exports: [],
-  providers: [AccountService, BuyServicesService,ACTIONS],
+  providers: [AccountService, BuyServicesService,CanDeactivateGuard,ACTIONS],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

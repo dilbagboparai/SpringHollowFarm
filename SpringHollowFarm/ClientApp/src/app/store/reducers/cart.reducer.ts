@@ -30,6 +30,13 @@ export default (state = initialState, action) => {
           ...state.products.slice(index + 1)
         ]
       }
+    };
+    case ActionTypes.REMOVE_ALL_FROM_CART: {
+      //  return a new array excluding the product that needs to be removed
+      return {
+        ...state,
+        products: []
+      }
     }
 
     default:

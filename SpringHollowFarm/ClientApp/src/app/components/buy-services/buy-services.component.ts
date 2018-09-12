@@ -80,6 +80,9 @@ export class BuyServicesComponent implements OnInit, AfterViewChecked {
    //On click of remove to cart
   removeService(item: Service) {
     this.cartStore.removeFromCart(item)
+    if (this.order.products.length == 0) {
+      this.addScript = false;
+    }
     //this.getTotalPrice();
   }
 
@@ -209,6 +212,8 @@ export class BuyServicesComponent implements OnInit, AfterViewChecked {
             this.submitted = false;
             this.paymentCompleted = true;
             this.order = new Order();
+            this.addScript = false;
+            this.cartStore.clearFromCart();
           },
           Error => {
             console.log(Error);
@@ -229,14 +234,22 @@ export class BuyServicesComponent implements OnInit, AfterViewChecked {
       });
     }
   }
-
+  onReloadPaypalLoad(): void {
+    paypal.Button.render(this.paypalConfig, '#paypal-checkout-btn');
+    this.paypalLoad = false;
+  }
   addPaypalScript() {
     this.addScript = true;
     return new Promise((resolve, reject) => {
-      let scripttagElement = document.createElement('script');
-      scripttagElement.src = 'https://www.paypalobjects.com/api/checkout.js';
-      scripttagElement.onload = resolve;
-      document.body.appendChild(scripttagElement);
+      var getPaypalScript = document.getElementById('paypalScript');
+      if (getPaypalScript == null) {
+        let scripttagElement = document.createElement('script');
+        scripttagElement.id = "paypalScript";
+        scripttagElement.src = 'https://www.paypalobjects.com/api/checkout.js';
+        scripttagElement.onload = resolve;
+        document.body.appendChild(scripttagElement);
+      } else
+       setTimeout(()=>this.onReloadPaypalLoad(),10);
     });
   }
 }
