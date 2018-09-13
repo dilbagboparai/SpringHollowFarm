@@ -38,7 +38,7 @@ const routes: Routes = [
   { path: "services", component: ServicesComponent },
   { path: "events-calender", component: EventsCalenderComponent },
   { path: "about-us", component: AboutUsComponent },
-  { path: "buy-services", component: BuyServicesComponent }
+  { path: "buy-services", component: BuyServicesComponent, canDeactivate:[CanDeactivateGuard] }
 ];
 @NgModule({
   declarations: [

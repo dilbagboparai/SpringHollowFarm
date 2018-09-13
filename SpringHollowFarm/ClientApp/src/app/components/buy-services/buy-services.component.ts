@@ -1,4 +1,5 @@
-import { Component, AfterViewChecked, OnInit ,Directive} from '@angular/core';
+import { Component, AfterViewChecked, OnInit, Directive } from '@angular/core';
+import {  FormCanDeactivate} from "../../form-can-deactivate/form-can-deactivate";
 import { ToastyService } from 'ng2-toasty';
 import { NgForm } from '@angular/forms';
 import { BuyServicesService } from '../../services/buy-services/buy-services.service';
@@ -14,7 +15,7 @@ Component({
   styleUrls: ['./buy-services.component.css']
 })
  
-export class BuyServicesComponent implements OnInit, AfterViewChecked {
+export class BuyServicesComponent extends FormCanDeactivate implements OnInit, AfterViewChecked {
   public services: Service[];
   quantity: number;
   public order: Order = new Order();
@@ -22,14 +23,19 @@ export class BuyServicesComponent implements OnInit, AfterViewChecked {
   public cartSubscription: Subscription;
   public orderForm:NgForm;
   submitted: boolean = false;
-  paymentCompleted:boolean=false;
+  paymentCompleted: boolean = false;
+
+  cartOrder: Order=null;
+
   constructor(private toast: ToastyService, private buyServices: BuyServicesService, private cartStore: CartAction) {
+    super()
   }
 
   ngOnInit() {
     this.cartSubscription = this.cartStore.getState().subscribe(res => {
       this.order.products = res.products
       this.getTotalPrice()
+      this.cartOrder = this.order
     })
     let element: HTMLElement = document.getElementsByClassName('tablinks')[0] as HTMLElement;
     element.click();
@@ -38,6 +44,7 @@ export class BuyServicesComponent implements OnInit, AfterViewChecked {
   }
 
   ngOnDestroy() {
+    this.cartStore.clearFromCart();
     this.cartSubscription.unsubscribe()
   }
 

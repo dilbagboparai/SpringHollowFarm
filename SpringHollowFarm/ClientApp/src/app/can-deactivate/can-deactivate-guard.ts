@@ -8,7 +8,7 @@ export class CanDeactivateGuard implements CanDeactivate<ComponentCanDeactivate>
   canDeactivate(component: ComponentCanDeactivate): boolean {
 
   if (!component.canDeactivate()) {
-    if (confirm("You have unsaved changes! If you leave, your changes will be lost.")) {
+    if (confirm("You have unpayed cart items! If you leave, your changes will be lost.")) {
       return true;
     } else {
       return false;
